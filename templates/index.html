@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<style>
+
+</style>
+
+<head>
+
+    <link rel="stylesheet" type="text/css"
+    	href="{{ url_for('static', filename='stylesheet.css') }}">
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/queue.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+
+</head>
+
+<title>
+    Title
+</title>
+
+
+<div id="tabs"
+			style="height: 100%; width: 100%; overflow: hidden;">
+			<div onclick="onTeamClicked()" id="leftTab" style="float: left; width: 50%;background-color: lightblue; cursor: pointer; border-style: solid;">
+				<h id="leftDesc" align="left"> <font size="3">Team Scouting </h>
+
+			</div>
+			<div onclick="onPlayerClicked()" id="rightTab" style="float: right; width: 49%;background-color: lightblue; cursor: pointer; border-style: solid;">
+				<h id="rightDesc" align="left"> <font size="3">Global Player Scouting </h>
+
+			</div>
+</div>
+
+<div id="teamSection">
+<div id="mainBubble" style="height: 250px;"></div>
+<div id="contentArea" style="height: 100%; visibility: hidden;">
+    <div id="wholeThing"
+			style="height: 100%; width: 100%; overflow: hidden;">
+			<div id="leftThing" style="float: left; height: 700px; width: 49%;">
+                <div id="wholeSelection" style= "overflow: hidden; height: 100px;">
+			         <div id="leftCol" style="float: left; height: 100%; width: 50%;">
+                         <form>
+                           <label><input id= "grouped" type="radio" name="mode" value="grouped" onclick="onModeChanged(this)"> Grouped</label>
+                           <label><input id= "stacked" type="radio" name="mode" value="stacked" checked onclick="onModeChanged(this)"> Stacked</label>
+                         </form>
+
+			         </div>
+
+			         <div id="rightCol" style="float: right; height: 100%; width: 50%;">
+                         <form style="margin-left: 300px">
+                           <label><input id= "overall" type="radio" name="stat" value="overall" checked onclick="onStatChanged(this)"> Overall</label>
+                           <label><input id= "home" type="radio" name="stat" value="home" onclick="onStatChanged(this)"> Home</label>
+                           <label><input id= "away" type="radio" name="stat" value="away" onclick="onStatChanged(this)"> Away</label>
+                         </form>
+			         </div>
+		        </div>
+
+                <svg id="stackedBars" width="900" height="450"></svg>
+
+                <div class="three">
+                    <label id="position"><input id="Pos" type="checkbox" onclick="onParamChanged(this)"/>Position</label>
+                    <label id="points"><input id="Pts" type="checkbox" onclick="onParamChanged(this)"/>Points</label>
+                    <label id="wins"><input id="W" type="checkbox" onclick="onParamChanged(this)"/>Wins</label>
+                    <label id="losses"><input id="L" type="checkbox" onclick="onParamChanged(this)"/>Losses</label>
+                    <label id="draws"><input id="D" type="checkbox" onclick="onParamChanged(this)"/>Draws</label>
+                    <label id="gf"><input id="GF" type="checkbox" onclick="onParamChanged(this)"/>Goals For</label>
+                    <label id="ga"><input id="GA" type="checkbox" onclick="onParamChanged(this)"/>Goals against</label>
+                    <label id="gd"><input id="GD" type="checkbox" onclick="onParamChanged(this)"/>Goal difference</label>
+                    <label id="cs"><input id="CS" type="checkbox" onclick="onParamChanged(this)"/>Clean Sheets</label>
+                </div>
+
+
+
+			</div>
+			<div id="rightThing" style="float: right; height: 700px; width: 49%; ">
+                <svg id="multiLineGraph" width="900" height="550"></svg>
+			</div>
+		</div>
+    </div>
+</div>
+</div>
+
+
+
+<div id="playerSection" style="display: none; height: 100%; width: 100%; overflow: hidden;">
+    <div id="wholePlayerSection" style="height: 100%; width: 100%; overflow: hidden;">
+        <div data-role="main" class="ui-content" style="height: 130px;">
+
+                <div data-role="rangeslider" style="width: 100%;">
+                    <label for="Overall-min">Min-Overall:</label>
+                    <input type="range" name="overall-min" id="overall-min" value="85" min="50" max="100">
+                    <label for="Overall-max">Max-Overall:</label>
+                    <input type="range" name="overall-max" id="overall-max" value="90" min="50" max="100">
+                </div>
+                <input type="submit" data-inline="true" value="Submit" onclick="onRangeChanged()">
+
+        </div>
+		<div id="leftPlayerSection" style="float: left; width: 70%; border-color: #F07818;">
+			<svg id="scatter" width="1200" height="800"></svg>
+
+		</div>
+		<div id="rightPlayerSection" style="float: right; width: 30%; border-color: #F07818;">
+            <h id="playerName" align="left" style="margin-top: 50px"> Name</h>
+            <div id="playerCircles" style="margin-top: 20px">
+                <div class="row">
+                    <div class="grid" id="Attack" style="margin: 5px">
+                    <div class="grid" id="Defence" style="margin: 5px">
+                    <div class="grid" id="Physical" style="margin: 5px">
+                </div>
+                <div class="row">
+                    <div class="grid" id="Mental" style="margin: 5px">
+                    <div class="grid" id="Technical" style="margin: 5px">
+                    <div class="grid" id="GK" style="margin: 5px">
+                </div>
+
+            </div>
+		</div>
+	</div>
+
+
+
+</div>
+
+<body>
+
+    <script src="./static/js/bubbleMenu.js"></script>
+    <script src="./static/js/stackedBars.js"></script>
+    <script src="./static/js/multiLineGraph.js"></script>
+    <script src="./static/js/CircularProgress.js"></script>
+    <script src="./static/js/scatterplot.js"></script>
+    <script src="./static/js/main.js"></script>
+
+
+</body>
+
+
+</html>
